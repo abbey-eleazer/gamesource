@@ -1,5 +1,12 @@
 <template>
-  <div>
+  <div class="text-center m-3" v-if="loading">
+    <v-progress-circular
+      indeterminate
+      color="primary"
+    />
+  </div>
+
+  <div v-else>
     <Header />
     <RouterView />
   </div>
@@ -9,6 +16,10 @@
 
 import { RouterView } from "vue-router";
 import Header from "./components/navigation/header.vue";
+import {firstLoad} from "@/composables/auth.js";
+
+
+const {loading} = firstLoad();
 
 </script>
 

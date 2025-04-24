@@ -4,6 +4,7 @@ import router from "@/router";
 // firebase 
 
 import {AUTH, DB} from '@/utils/firebase.js'
+import errorCodes  from "@/utils/errorCodes.js";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 import { isAdmin } from "@firebase/util";
@@ -22,12 +23,24 @@ export const useUserStore = defineStore("user", {
     user: DEFAULT_USER,
     auth: false,
   }),
+
     getters: {},
 
     actions: {
         setUser(user) {
             this.user =  {...this.user, ...user}
             this.auth = true;
+            return true;
+        },
+
+        async autosignin(uid) {
+            try {
+                const userData = await this.getUserProfile(uid);
+                this.setUser(userData);
+                
+            } catch (error) {
+             
+            }
         },
 
         async getUserProfile(uid) {
@@ -38,10 +51,21 @@ export const useUserStore = defineStore("user", {
                 }
                  return userRef.data();
             } catch (error) {
-                throw new Error(error);
+                throw new Error(errorCodes(error.code));
             }
         },
-        async signin (formData) {
+
+        async signOut() {
+            
+                await signOut(AUTH);
+                this.user = DEFAULT_USER;
+                this.auth = false;
+
+                router.push({name: 'home'});
+            
+        },
+
+        async signIn(formData) {
             try {
                 this.loading = true;
                 
@@ -53,7 +77,7 @@ export const useUserStore = defineStore("user", {
                 router.push({name: 'dashboard'});
 
             } catch (error) {
-                throw new Error(error.code);
+                throw new Error(errorCodes(error.code));
             } finally {
                 this.loading = false;
             }
@@ -77,7 +101,7 @@ export const useUserStore = defineStore("user", {
                 router.push({name: 'dashboard'});
 
             } catch (error) {
-                throw new Error(error.code);
+                throw new Error(errorCodes(error.code));
             } finally {
                 this.loading = false;
             }

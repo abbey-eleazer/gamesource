@@ -9,12 +9,12 @@
 
             <div>
                 <ul>
-                    <li>
+                    <li v-if="!userStore.auth">
                         <router-link :to="{name: 'signin'}">Sign in</router-link>
                     </li>
 
-                    <span>
-                        <li>
+                    <span  v-if="userStore.auth">
+                        <li @click="userStore.signOut()" >
                             <span>
                                 Logout 
                             </span>
@@ -30,7 +30,9 @@
 </template>
 
 <script setup>
+    import {useUserStore} from "@/stores/user.js";
 
+    const userStore = useUserStore()
 </script>
 
 <style scoped>

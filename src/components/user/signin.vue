@@ -72,11 +72,15 @@ import { Form, Field } from 'vee-validate';
 import * as yup from 'yup'
 import { ref } from 'vue';
 
+
 //AUth store
 import { useUserStore } from '@/stores/user.js'
 
-    const userStore = useUserStore()
+import { useToast } from 'vue-toast-notification'
+const $toast = useToast()
 
+
+    const userStore = useUserStore()
     const type = ref(false)
 
     const formSchema = yup.object({
@@ -93,11 +97,23 @@ import { useUserStore } from '@/stores/user.js'
                 resetForm()
             })
         } else {
-            userStore.signin(values).then(() => {
+            userStore.signIn(values).then(() => {
                 resetForm()
             })
         }
     }
+
+    // error handling 
+    userStore.$onAction(({ name, after, onError }) => {
+        if (name === 'register' || name === 'signIn') {
+            after(() => {
+                $toast.success('Welcome back!')
+            })
+            onError((error) => {
+                $toast.error(error.message)
+            })
+        }
+    })
 </script>
 
 <style  scoped>
